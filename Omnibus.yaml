@@ -1,0 +1,163 @@
+---
+
+pipelineid: 12
+
+title: "Omnibus Create Inst"
+
+recordstatus: "Y"
+
+project:
+  name: "Default Project"
+
+release:edfwerfererfwer
+  name: "Default Release"
+
+stages:
+- title: "Stage 1"
+  stageorder: 0
+  color: "#3242a8"
+  tasks:
+  - tasktitle: "Start"
+    issystemtask: true
+    suborder: 0
+    tasktype: ""
+    agent: ""
+    postcondition: ""
+    precondition: ""
+    toolInstance:
+      method: null
+      pluginName: null
+      ignorefailed: null
+      skiptask: null
+      toolDetails: null
+  - tasktitle: "Update Customer Subscription Status"
+    issystemtask: false
+    suborder: 0
+    tasktype: "Plugin"
+    agent: "kovairdevopsapp"
+    postcondition: ""
+    precondition: ""
+    toolInstance:
+      method: "Update"
+      pluginName: "KovairALMPluginV.1.0"
+      ignorefailed: "N"
+      skiptask: "N"
+      toolDetails:
+      - direction: "OUT"
+        paramdatatype: "SingleLineText"
+        paramname: "EntityID"
+        paramvalue: null
+        paramorder: 0
+        issecurityparam: "N"
+      - direction: "OUT"
+        paramdatatype: "SingleLineText"
+        paramname: "Location"
+        paramvalue: null
+        paramorder: 0
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "API Base URL"
+        paramvalue: "https://cloud.kovair.com/DevOpsCloud/KovairDevOpsWebAPI"
+        paramorder: 1
+        issecurityparam: "Y"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "UserName"
+        paramvalue: "api"
+        paramorder: 2
+        issecurityparam: "Y"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "Password"
+        paramvalue: "api@123"
+        paramorder: 3
+        issecurityparam: "Y"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "DomainAlias"
+        paramvalue: ""
+        paramorder: 4
+        issecurityparam: "Y"
+      - direction: "IN"
+        paramdatatype: "Lookup"
+        paramname: "sysProject"
+        paramvalue: "5009"
+        paramorder: 50
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "Lookup"
+        paramname: "sysEntity"
+        paramvalue: "5068"
+        paramorder: 51
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "sysEntityId"
+        paramvalue: "$[Global#Unique Id]"
+        paramorder: 52
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "Lookup"
+        paramname: "Azure Subscription Status"
+        paramvalue: "Subscribed"
+        paramorder: 53
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "Lookup"
+        paramname: "Status"
+        paramvalue: "Not Started"
+        paramorder: 54
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "Title"
+        paramvalue: "$[Global#Company]"
+        paramorder: 55
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "Lookup"
+        paramname: "Is Customer to be Notified"
+        paramvalue: "Yes"
+        paramorder: 56
+        issecurityparam: "N"
+  - tasktitle: "Update Customer Subscription Status in Microsoft"
+    issystemtask: false
+    suborder: 0
+    tasktype: "Plugin"
+    agent: "ip-172-31-3-169.us-east-2.compute.internal"
+    postcondition: ""
+    precondition: ""
+    toolInstance:
+      method: "ExecuteShellCommand"
+      pluginName: "CustomCommandPluginV.1.0"
+      ignorefailed: "N"
+      skiptask: "N"
+      toolDetails:
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "inputhostname"
+        paramvalue: ""
+        paramorder: 100
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "MultiLineText"
+        paramname: "Command"
+        paramvalue: "authorizationToken=$(curl -s --location --request POST 'https://login.microsoftonline.com/3cd788f0-4406-4d04-afa9-b28bca6e0b21/oauth2/token'\
+          \ --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode\
+          \ 'grant_type=client_credentials' --data-urlencode 'client_id=e13c4696-cbed-4d02-9434-187f09c0401e'\
+          \ --data-urlencode 'client_secret=oqI8Q~s7~3.t_yllnOEEeyifvR0yPcKaSYjW2aSP'\
+          \ --data-urlencode 'resource=20e940b3-4c77-4b0b-9a53-9e16a1b010a7' | /home/ansible/infra-auto-provisioning-devops-saas/ansible-for-devops-saas/jq-linux64\
+          \ --raw-output '.access_token')\n\ncurl -s --location --request POST \"\
+          https://marketplaceapi.microsoft.com/api/saas/subscriptions/$[Global#Subscription\
+          \ Id]/activate?api-version=2018-08-31\" --header 'Content-Type: application/json'\
+          \ --header \"authorization: Bearer $authorizationToken\" --data-raw '{ \"\
+          planId\": \"$[Global#Plan Id]\", \"quantity\": \"\" }'"
+        paramorder: 1
+        issecurityparam: "N"
+      - direction: "IN"
+        paramdatatype: "SingleLineText"
+        paramname: "Error Text"
+        paramvalue: ""
+        paramorder: 2
+        issecurityparam: "N"
